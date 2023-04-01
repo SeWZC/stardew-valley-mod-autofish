@@ -157,7 +157,7 @@ namespace AutoFish
                 > 0 => MathF.Sqrt(2 * deltaSpeed * targetDisplacement),
                 0 => 0,
                 < 0 => -MathF.Sqrt(2 * deltaSpeed * -targetDisplacement),
-                _ => throw new ArgumentOutOfRangeException(nameof(targetDisplacement), targetDisplacement, null)
+                _ => throw new ArgumentOutOfRangeException(nameof(targetDisplacement), targetDisplacement, null),
             };
         }
     }
