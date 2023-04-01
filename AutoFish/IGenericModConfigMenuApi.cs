@@ -38,6 +38,47 @@ namespace AutoFish
         /// </param>
         void AddBoolOption(IManifest mod, Func<bool> getValue, Action<bool> setValue, Func<string> name, Func<string>? tooltip = null, string? fieldId = null);
 
+        /// <summary>Add an integer option at the current position in the form.</summary>
+        /// <param name="mod">The mod's manifest.</param>
+        /// <param name="getValue">Get the current value from the mod config.</param>
+        /// <param name="setValue">Set a new value in the mod config.</param>
+        /// <param name="name">The label text to show in the form.</param>
+        /// <param name="tooltip">
+        ///     The tooltip text shown when the cursor hovers on the field, or <c>null</c> to disable the
+        ///     tooltip.
+        /// </param>
+        /// <param name="min">The minimum allowed value, or <c>null</c> to allow any.</param>
+        /// <param name="max">The maximum allowed value, or <c>null</c> to allow any.</param>
+        /// <param name="interval">The interval of values that can be selected.</param>
+        /// <param name="formatValue">Get the display text to show for a value, or <c>null</c> to show the number as-is.</param>
+        /// <param name="fieldId">
+        ///     The unique field ID for use with <see cref="OnFieldChanged" />, or <c>null</c> to auto-generate a
+        ///     randomized ID.
+        /// </param>
+        void AddNumberOption(IManifest mod, Func<int> getValue, Action<int> setValue, Func<string> name, Func<string>? tooltip = null, int? min = null,
+            int? max = null, int? interval = null, Func<int, string>? formatValue = null, string? fieldId = null);
+
+        /// <summary>Add a string option at the current position in the form.</summary>
+        /// <param name="mod">The mod's manifest.</param>
+        /// <param name="getValue">Get the current value from the mod config.</param>
+        /// <param name="setValue">Set a new value in the mod config.</param>
+        /// <param name="name">The label text to show in the form.</param>
+        /// <param name="tooltip">
+        ///     The tooltip text shown when the cursor hovers on the field, or <c>null</c> to disable the
+        ///     tooltip.
+        /// </param>
+        /// <param name="allowedValues">The values that can be selected, or <c>null</c> to allow any.</param>
+        /// <param name="formatAllowedValue">
+        ///     Get the display text to show for a value from <paramref name="allowedValues" />, or
+        ///     <c>null</c> to show the values as-is.
+        /// </param>
+        /// <param name="fieldId">
+        ///     The unique field ID for use with <see cref="OnFieldChanged" />, or <c>null</c> to auto-generate a
+        ///     randomized ID.
+        /// </param>
+        void AddTextOption(IManifest mod, Func<string> getValue, Action<string> setValue, Func<string> name, Func<string>? tooltip = null,
+            string[]? allowedValues = null, Func<string, string>? formatAllowedValue = null, string? fieldId = null);
+
         /// <summary>Register a method to notify when any option registered by this mod is edited through the config UI.</summary>
         /// <param name="mod">The mod's manifest.</param>
         /// <param name="onChange">The method to call with the option's unique field ID and new value.</param>
@@ -50,5 +91,22 @@ namespace AutoFish
         /// <summary>Remove a mod from the config UI and delete all its options and pages.</summary>
         /// <param name="mod">The mod's manifest.</param>
         void Unregister(IManifest mod);
+    }
+
+    public static class GenericModConfigMenuApiExtensions
+    {
+        public static void AddEnumTextOption<TEnum>(this IGenericModConfigMenuApi gmcm, IManifest mod, Func<TEnum> getValue, Action<TEnum> setValue,
+            Func<string> name,
+            Func<string>? tooltip = null, Func<TEnum, string>? formatAllowedValue = null, string? fieldId = null) where TEnum : struct, Enum
+        {
+            gmcm.AddTextOption(mod,
+                name: name,
+                getValue: () => getValue().ToString(),
+                setValue: value => setValue(Enum.Parse<TEnum>(value)),
+                tooltip: tooltip,
+                allowedValues: Enum.GetNames<TEnum>(),
+                formatAllowedValue: formatAllowedValue is not null ? value => formatAllowedValue(Enum.Parse<TEnum>(value)) : null,
+                fieldId: fieldId);
+        }
     }
 }
