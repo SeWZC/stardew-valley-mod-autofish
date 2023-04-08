@@ -379,8 +379,8 @@ namespace AutoFish
                             Player.FacingDirection = _facingDirection.Value;
                         _fishingPodIndex = null;
                         _facingDirection = null;
-                        if (Player.CurrentTool is FishingRod fishingRod)
-                            fishingRod.beginUsing(Player.currentLocation, (int)Player.GetToolLocation().X, (int)Player.GetToolLocation().Y, Player);
+                        if (Player.CurrentTool is FishingRod)
+                            Game1.pressUseToolButton();
                         return new AfterMiniGame(this).Next();
                     case ContinuousFishingValue.None:
                     case ContinuousFishingValue.UntilStaminaTooLow when Player is { Stamina: < 20 }:
